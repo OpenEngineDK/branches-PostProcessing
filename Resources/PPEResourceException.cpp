@@ -4,7 +4,7 @@
 namespace OpenEngine {
 namespace Resources {
 
-PPEResourceException::PPEResourceException(char* message) : Exception(message) {
+PPEResourceException::PPEResourceException(const char* message) : Exception(message) {
     this->message = message;
 
     // the following is temp!
@@ -14,7 +14,7 @@ PPEResourceException::PPEResourceException(char* message) : Exception(message) {
     null->toString();
 }
 
-char* PPEResourceException::toString() {
+const char* PPEResourceException::toString() {
     return message;
 }
 

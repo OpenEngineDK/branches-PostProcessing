@@ -36,7 +36,7 @@ class PostProcessingPass : public IPostProcessingPass {
     int  passID;                  // used for error-checking in bindUserBuffer()
     IPostProcessingEffect* ppe;   // used for error-checking in bindUserBuffer()
 
-    int maxColorAttachments;
+    GLint maxColorAttachments;
     int currScreenWidth;
     int currScreenHeight;
 

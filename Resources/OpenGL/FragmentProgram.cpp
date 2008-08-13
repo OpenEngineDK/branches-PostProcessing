@@ -1,6 +1,8 @@
 #include "FragmentProgram.h"
 #include <Resources/ResourceManager.h>
+
 #include <Resources/DirectoryManager.h>
+
 
 // see http://www.opengl.org/sdk/docs/man/xhtml/glUniform.xml for how to set uniforms
 
@@ -182,7 +184,7 @@ void FragmentProgram::BindInt(string parameterName, vector<vector<int> > intvect
     if (vectorsize < 1 || vectorsize > 4) throw new PPEResourceException("GLSL doesn't have a ivecX type, with the supplied X!");
 
     // create a C array of all the intvector-values (to be supplied to OpenGL)
-    int* intarray = new int[vectorsize * intvectors.size()];
+      GLint* intarray = new GLint[vectorsize * intvectors.size()];
 
     for (int i=0; i<intvectors.size(); i++) {
         vector<int> intvector = intvectors.at(i);
@@ -289,6 +291,7 @@ void FragmentProgram::BindMatrix(string parameterName, int n, int m, vector<vect
     if (floatmatrices.size() == 0) return;
 
     int matrixsize = floatmatrices.at(0).size(); // num entries in each matrix
+    logger.info << "n: " << n << " m: " << m << logger.end;
     if (matrixsize != n*m) throw new PPEResourceException("supplied vector-size doesn't match supplied dimensions!");
     if (n<2 || n>4 || m<2 || m>4) throw new PPEResourceException("unsupported dimensions!");
 

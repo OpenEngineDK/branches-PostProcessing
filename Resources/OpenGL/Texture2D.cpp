@@ -1,5 +1,9 @@
 #include "Texture2D.h"
 
+#include <Utils/Convert.h>
+
+using OpenEngine::Utils::Convert;
+
 /* @author Bjarke N. Laustsen
  */
 namespace OpenEngine {
@@ -309,7 +313,7 @@ TexelFormat Texture2D::GetOEInternalFormat(GLint glInternalFormat) {
 	case GL_LUMINANCE16F_ARB:     return TEX_LUMINANCE_FLOAT;
 	case GL_RGB16F_ARB:           return TEX_RGB_FLOAT;
 	case GL_RGBA16F_ARB:          return TEX_RGBA_FLOAT;
-	default:                      throw new PPEResourceException("getOEInternalFormat: illegal format");
+    default:                      throw new PPEResourceException(("getOEInternalFormat: illegal format: " + Convert::ToString(glInternalFormat)).c_str());
     }
 }
 

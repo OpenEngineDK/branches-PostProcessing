@@ -13,11 +13,11 @@ using OpenEngine::Core::Exception;
 
 class PPEResourceException : public Exception {
   private:
-    char* message;
+  const char* message;
   public:
     PPEResourceException() : Exception() {};
-    PPEResourceException(char* message);
-    char* toString();
+    PPEResourceException(const char* message);
+    const char* toString();
 };
 
 } // NS Resources
