@@ -315,13 +315,17 @@ void FragmentProgram::BindMatrix(string parameterName, int n, int m, vector<vect
 
     // set value of variable
     if (n==2 && m==2) glUniformMatrix2fv  (paramID, floatmatrices.size(), (GLboolean)transpose, floatarray);
+      /* CPVC, gl 2.1
     if (n==2 && m==3) glUniformMatrix2x3fv(paramID, floatmatrices.size(), (GLboolean)transpose, floatarray);
     if (n==2 && m==4) glUniformMatrix2x4fv(paramID, floatmatrices.size(), (GLboolean)transpose, floatarray);
     if (n==3 && m==2) glUniformMatrix3x2fv(paramID, floatmatrices.size(), (GLboolean)transpose, floatarray);
+      */
     if (n==3 && m==3) glUniformMatrix3fv  (paramID, floatmatrices.size(), (GLboolean)transpose, floatarray);
+      /* CPVC, gl 2.1
     if (n==3 && m==4) glUniformMatrix3x4fv(paramID, floatmatrices.size(), (GLboolean)transpose, floatarray);
     if (n==4 && m==2) glUniformMatrix4x2fv(paramID, floatmatrices.size(), (GLboolean)transpose, floatarray);
     if (n==4 && m==3) glUniformMatrix4x3fv(paramID, floatmatrices.size(), (GLboolean)transpose, floatarray);
+      */
     if (n==4 && m==4) glUniformMatrix4fv  (paramID, floatmatrices.size(), (GLboolean)transpose, floatarray);
 
     GuardedUnbind();
