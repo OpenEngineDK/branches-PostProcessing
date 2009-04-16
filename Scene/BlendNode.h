@@ -25,6 +25,7 @@ using namespace OpenEngine::PostProcessing;
  * @author Bjarke N. Laustsen
  */
 class BlendNode : public SceneNode {
+    OE_SCENE_NODE(QuadNode, ISceneNode)
   private:
     PostProcessingEffect* ppe;
     float alpha;
@@ -34,7 +35,6 @@ class BlendNode : public SceneNode {
     BlendNode(PostProcessingEffect* ppe, const float alpha = 1.0f);
     ~BlendNode();
 
-    void Accept(ISceneNodeVisitor& visitor);
     void ApplyToSubNodes(ISceneNodeVisitor& visitor);
 
     void SetAlpha(float alpha);

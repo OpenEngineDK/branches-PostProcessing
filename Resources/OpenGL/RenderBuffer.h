@@ -49,10 +49,10 @@ class RenderBuffer : public IRenderBuffer {
 
     PixelFormat GetFormat();
 
-    int GetWidth();
-    int GetHeight();
+    unsigned int GetWidth();
+    unsigned int GetHeight();
     int GetZDepth(); // <-. to make it work with ITextureResource, we can't call it getDepth :(
-    int GetDepth(); // <- not z-depth, but bit-depth
+    unsigned int GetDepth(); // <- not z-depth, but bit-depth
 
     void Resize(int width, int height);
     void Resize(int width, int height, PixelFormat format);

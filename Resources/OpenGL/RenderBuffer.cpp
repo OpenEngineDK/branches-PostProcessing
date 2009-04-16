@@ -45,7 +45,7 @@ int RenderBuffer::GetID() {
 /** get the width of this renderbuffer
  *  @returns the width
  */
-int RenderBuffer::GetWidth() {
+unsigned int RenderBuffer::GetWidth() {
     GuardedBind(); // avoid side effects
     GLsizei width;
     glGetRenderbufferParameterivEXT(GL_RENDERBUFFER_EXT, GL_RENDERBUFFER_WIDTH_EXT, &width);
@@ -56,7 +56,7 @@ int RenderBuffer::GetWidth() {
 /** get the height of this renderbuffer
  *  @returns the height
  */
-int RenderBuffer::GetHeight() {
+unsigned int RenderBuffer::GetHeight() {
     GuardedBind(); // avoid side effects
     GLsizei height;
     glGetRenderbufferParameterivEXT(GL_RENDERBUFFER_EXT, GL_RENDERBUFFER_HEIGHT_EXT, &height);
@@ -75,7 +75,7 @@ int RenderBuffer::GetZDepth() {
 /** get the bit-depth of this renderbuffer (not z-depth!!!)
  *  @returns the bit-depth
  */
-int RenderBuffer::GetDepth() {
+unsigned int RenderBuffer::GetDepth() {
     throw new NotImplemented();
 }
 

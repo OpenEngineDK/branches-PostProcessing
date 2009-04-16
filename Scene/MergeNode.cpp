@@ -7,20 +7,16 @@
 namespace OpenEngine {
 namespace Scene {
 
-MergeNode::MergeNode(PostProcessingEffect* ppe, const float alpha, const bool useFloatBuffers) {
+    MergeNode::MergeNode(PostProcessingEffect* ppe, IEngine& engine, const float alpha, const bool useFloatBuffers) {
     this->ppe = ppe;
     this->newparentColorTex = ITexture2DPtr(new Texture2D(1, 1, TEX_RGBA , TEX_REPEAT, TEX_REPEAT, TEX_LINEAR, TEX_LINEAR));
     this->newparentDepthTex = ITexture2DPtr(new Texture2D(1, 1, TEX_DEPTH, TEX_REPEAT, TEX_REPEAT, TEX_LINEAR, TEX_LINEAR));
-    merge = new Merge(ppe->GetViewport(), useFloatBuffers);
+    merge = new Merge(ppe->GetViewport(),engine, useFloatBuffers);
     ppe->Add(merge);
 }
 
 MergeNode::~MergeNode() {
     delete merge;
-}
-
-void MergeNode::Accept(ISceneNodeVisitor& visitor) {
-    visitor.VisitMergeNode(this);
 }
 
 void MergeNode::ApplyToSubNodes(ISceneNodeVisitor& visitor) {
@@ -56,9 +52,8 @@ void MergeNode::GetParentTextures() {
 
 
 /* Merge class */
-
-MergeNode::Merge::Merge(Viewport* viewport, bool useFloatBuffers) : PostProcessingEffect(viewport, useFloatBuffers) {
-}
+MergeNode::Merge::Merge(Viewport* viewport, IEngine& engine, bool useFloatBuffers) 
+    : PostProcessingEffect(viewport, engine, useFloatBuffers) {}
 
 void MergeNode::Merge::Setup() {
     //string path = ResourceManager::GetPath();

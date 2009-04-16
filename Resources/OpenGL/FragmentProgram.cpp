@@ -40,10 +40,10 @@ void FragmentProgram::ConstructorSetup(vector<string> filenames) {
 }
 
 FragmentProgram::~FragmentProgram() {
-    for (int i=0; i<shaderIDs.size(); i++)
+    for (unsigned int i=0; i<shaderIDs.size(); i++)
         glDeleteShader(shaderIDs.at(i));
     glDeleteProgram(programID);
-    for (int i=0; i<textureBindings.size(); i++)
+    for (unsigned int i=0; i<textureBindings.size(); i++)
         delete textureBindings.at(i);
 }
 
@@ -57,7 +57,7 @@ int FragmentProgram::GetMaxTextureBindings() {
 void FragmentProgram::SetupFragmentProgram(vector<string> filenames) {
 
     // create the shaders
-    for (int i=0; i<filenames.size(); i++) {
+    for (unsigned int i=0; i<filenames.size(); i++) {
 	string filename = filenames.at(i);
 	GLuint shaderID = glCreateShader(GL_FRAGMENT_SHADER);
 	shaderIDs.push_back(shaderID);
@@ -88,7 +88,7 @@ void FragmentProgram::SetupFragmentProgram(vector<string> filenames) {
 
     // create a program (link all the shaders together to create the executable shader program)
     programID = glCreateProgram();
-    for (int i=0; i<shaderIDs.size(); i++)
+    for (unsigned int i=0; i<shaderIDs.size(); i++)
         glAttachShader(programID, shaderIDs.at(i));
     glLinkProgram(programID);
 
@@ -102,7 +102,7 @@ void FragmentProgram::SetupFragmentProgram(vector<string> filenames) {
 	char*   infoLog = new char[bufSize];
 	glGetProgramInfoLog(programID, bufSize, &length, infoLog);
 	if (length>0) {
-	    for (int i=0; i<filenames.size(); i++) logger.error << "\"" << filenames.at(i) << "\" ";
+	    for (unsigned int i=0; i<filenames.size(); i++) logger.error << "\"" << filenames.at(i) << "\" ";
 	    logger.error << "linker output:\n" << infoLog << logger.end;
 	}
 	delete infoLog;
@@ -186,10 +186,10 @@ void FragmentProgram::BindInt(string parameterName, vector<vector<int> > intvect
     // create a C array of all the intvector-values (to be supplied to OpenGL)
       GLint* intarray = new GLint[vectorsize * intvectors.size()];
 
-    for (int i=0; i<intvectors.size(); i++) {
+    for (unsigned int i=0; i<intvectors.size(); i++) {
         vector<int> intvector = intvectors.at(i);
 	if (intvector.size() != vectorsize) throw new PPEResourceException("all vectors in an array must have the same size!");
-	for (int j=0; j<vectorsize; j++)
+	for (unsigned int j=0; j<vectorsize; j++)
 	    intarray[i*vectorsize + j] = intvector.at(j);
     }
 
@@ -241,10 +241,10 @@ void FragmentProgram::BindFloat(string parameterName, vector<vector<float> > flo
     // create a C array of all the floatvector-values (to be supplied to OpenGL)
     float* floatarray = new float[vectorsize * floatvectors.size()];
 
-    for (int i=0; i<floatvectors.size(); i++) {
+    for (unsigned int i=0; i<floatvectors.size(); i++) {
         vector<float> floatvector = floatvectors.at(i);
 	if (floatvector.size() != vectorsize) throw new PPEResourceException("all vectors in an array must have the same size!");
-	for (int j=0; j<vectorsize; j++)
+	for (unsigned int j=0; j<vectorsize; j++)
 	    floatarray[i*vectorsize + j] = floatvector.at(j);
     }
 
@@ -294,14 +294,15 @@ void FragmentProgram::BindMatrix(string parameterName, int n, int m, vector<vect
     logger.info << "n: " << n << " m: " << m << logger.end;
     if (matrixsize != n*m) throw new PPEResourceException("supplied vector-size doesn't match supplied dimensions!");
     if (n<2 || n>4 || m<2 || m>4) throw new PPEResourceException("unsupported dimensions!");
+    if (n != m) throw new PPEResourceException("dimensions not equal!");
 
     // create a C array of all the floatmatrix-entries (to be supplied to OpenGL)
     float* floatarray = new float[matrixsize * floatmatrices.size()];
 
-    for (int i=0; i<floatmatrices.size(); i++) {
+    for (unsigned int i=0; i<floatmatrices.size(); i++) {
         vector<float> floatmatrix = floatmatrices.at(i);
 	if (floatmatrix.size() != matrixsize) throw new PPEResourceException("all matrices in an array must have the same size!");
-	for (int j=0; j<matrixsize; j++)
+	for (unsigned int j=0; j<matrixsize; j++)
 	    floatarray[i*matrixsize + j] = floatmatrix.at(j);
     }
 
@@ -341,7 +342,7 @@ void FragmentProgram::BindTexture(string parameterName, ITextureResourcePtr text
 
     // check if parameterName was already bound to some texture (if it was: replace it with the supplied texture)
     bool found = false;
-    for (int i=0; i<textureBindings.size(); i++) {
+    for (unsigned int i=0; i<textureBindings.size(); i++) {
 	TextureBinding* texbind = textureBindings.at(i);
 
 	if (texbind->parameterName == parameterName) {
@@ -368,7 +369,7 @@ void FragmentProgram::BindTexture(string parameterName, ITextureResourcePtr text
  */
 void FragmentProgram::SetupTextureUnits() {
 
-    for (int i=0; i<textureBindings.size(); i++) {
+    for (unsigned int i=0; i<textureBindings.size(); i++) {
 	TextureBinding* texbind = textureBindings.at(i);
 
 	glActiveTexture(GL_TEXTURE0 + i);

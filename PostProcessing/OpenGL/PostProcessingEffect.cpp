@@ -11,7 +11,7 @@ namespace PostProcessing {
  *  @param[in] viewport the viewport this effects should be applied to
  *  @param[in] useFloatTextures whether the colorbuffer textures should be floating-point
  */
-PostProcessingEffect::PostProcessingEffect(Viewport* viewport, const bool useFloatTextures) {
+    PostProcessingEffect::PostProcessingEffect(Viewport* viewport, IEngine& engine, const bool useFloatTextures) : engine(engine) {
     this->viewport         = viewport;
     this->currScreenWidth  = viewport->GetDimension()[2];
     this->currScreenHeight = viewport->GetDimension()[3];
@@ -48,8 +48,7 @@ PostProcessingEffect::PostProcessingEffect(Viewport* viewport, const bool useFlo
     this->finalDepthTex.reset();
 
     // register this object as a module
-    IGameEngine& engine = IGameEngine::Instance();
-    engine.AddModule(*this);
+    engine.ProcessEvent().Attach(*this);
 }
 
 /** Cleans up
@@ -59,12 +58,11 @@ PostProcessingEffect::~PostProcessingEffect() {
     delete fbo;
 
     // delete all passes (fragment programs, userbuffers, etc)
-    for (int i=0; i<passes.size(); i++)
+    for (unsigned int i=0; i<passes.size(); i++)
         delete passes.at(i);
 
     // unregister this object as a module
-    IGameEngine& engine = IGameEngine::Instance();
-    engine.RemoveModule(*this);
+    engine.ProcessEvent().Detach(*this);
 }
 
 
@@ -128,6 +126,7 @@ void PostProcessingEffect::PreRender(bool bindFbo) {
     // setup on first frame on this PPE and all chained PPEs (also new PPEs which might have been added since last frame)
     CallSetup();
 
+
      // check if viewport has been resized. If so, resize all buffers (incl. chained)
     if (viewport->GetDimension()[2] != currScreenWidth || viewport->GetDimension()[3] != currScreenHeight)
         Resize(viewport->GetDimension()[2], viewport->GetDimension()[3]);
@@ -135,7 +134,7 @@ void PostProcessingEffect::PreRender(bool bindFbo) {
     // don't need to clear normal framebuffer buffers, since they will completely be overwritten (faster!)
 
     // if any PPEs are chained to this one, call PerFrame on them as well (but don't bind their fbo) (must be done after CallSetup())
-    for (int i=0; i<chainedEffects.size(); i++) {
+    for (unsigned int i=0; i<chainedEffects.size(); i++) {
 	PostProcessingEffect* ppe = chainedEffects.at(i);
 	ppe->PreRender(false);
     }
@@ -226,7 +225,7 @@ void PostProcessingEffect::PostRender(ITexture2DPtr colorTex1Param, ITexture2DPt
     ITexture2DPtr inputDepthTex  = depthTex1Param;
     ITexture2DPtr outputDepthTex = depthTex2;
 
-    if (enabled) for (int i=0; i<passes.size(); i++) {
+    if (enabled) for (unsigned int i=0; i<passes.size(); i++) {
 	PostProcessingPass* pass = passes.at(i);
 
 	// execute the pass
@@ -242,7 +241,7 @@ void PostProcessingEffect::PostRender(ITexture2DPtr colorTex1Param, ITexture2DPt
     Swap(&inputDepthTex, &outputDepthTex);
 
     // if any PPEs are chained to this one, execute them, and get the final color and depth texture of the last PPE
-    for (int i=0; i<chainedEffects.size(); i++) {
+    for (unsigned int i=0; i<chainedEffects.size(); i++) {
 	PostProcessingEffect* ppe = chainedEffects.at(i);
 	ppe->PostRender(outputColorTex, outputDepthTex, false); // false, so that the chained ppes doesn't output to screen, just to texture
 	outputColorTex = ppe->GetFinalColorBufferRef();
@@ -331,7 +330,7 @@ void PostProcessingEffect::Resize(int currScreenWidth, int currScreenHeight) {
     //stencilTex->Resize(currScreenWidth, currScreenHeight);
 
     // resize alle userbuffers
-    for (int i=0; i<passes.size(); i++) {
+    for (unsigned int i=0; i<passes.size(); i++) {
 	PostProcessingPass* pass = passes.at(i);
 	pass->Resize(currScreenWidth, currScreenHeight);
     }
@@ -642,24 +641,11 @@ Viewport* PostProcessingEffect::GetViewport() {
 }
 
 
-
-/* methods inherited from IModule */
-
-void PostProcessingEffect::Initialize() {
-}
-
 // only call PerFrame AFTER drawing a frame and ONLY on the frames this PostProcessingEffect actually were used on the frame
-void PostProcessingEffect::Process(const float deltaTime, const float percent) {
+    void PostProcessingEffect::Handle(ProcessEventArg arg) {
+    float deltaTime = arg.approx / 1000.0f;
     if (callPerFrame) PerFrame(deltaTime);
     callPerFrame = false;
-}
-
-void PostProcessingEffect::Deinitialize() {
-}
-
-// google "c++ typeid" for info
-bool PostProcessingEffect::IsTypeOf(const std::type_info& inf) {
-    return typeid(PostProcessingEffect) == inf;
 }
 
 

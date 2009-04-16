@@ -414,6 +414,7 @@ void PostProcessingPass::SetProperViewport(Viewport* viewport, bool fbo) {
     // viewport for 1:1 pixel=texel=geometry mapping
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
+
     gluOrtho2D(0,
                viewport->GetDimension()[2],
                0,

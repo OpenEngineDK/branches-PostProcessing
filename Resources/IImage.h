@@ -26,10 +26,10 @@ class IImage {
 
     virtual int GetID() = 0; // <- note different image types can share the same ID. So an ID is not unique over all image types.
 
-    virtual int GetWidth() = 0;
-    virtual int GetHeight() = 0;
+    virtual unsigned int GetWidth() = 0;
+    virtual unsigned int GetHeight() = 0;
     virtual int GetZDepth() = 0; // <-. to make it work with ITextureResource, we can't call it getDepth
-    virtual int GetDepth() = 0;  // <- This is NOT the image-depth, but instead the bit-depth of each pixel.
+    virtual unsigned int GetDepth() = 0;  // <- This is NOT the image-depth, but instead the bit-depth of each pixel.
     			 	 //    Will give problems when adding 3D-textures, but this is to keep compatible with ITextureResource.
     virtual unsigned char* GetData() = 0;
     virtual float* GetFloatData() = 0;

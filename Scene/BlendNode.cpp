@@ -13,10 +13,6 @@ BlendNode::BlendNode(PostProcessingEffect* ppe, const float alpha) {
 BlendNode::~BlendNode() {
 }
 
-void BlendNode::Accept(ISceneNodeVisitor& visitor) {
-    visitor.VisitBlendNode(this);
-}
-
 void BlendNode::ApplyToSubNodes(ISceneNodeVisitor& visitor) {
 
     ppe->PreRender();
@@ -90,3 +86,4 @@ void BlendNode::SetAlpha(float alpha) {
 
 } // NS Scene
 } // NS OpenEngine
+

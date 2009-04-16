@@ -7,25 +7,21 @@
 namespace OpenEngine {
 namespace Scene {
 
-MergeBlendNode::MergeBlendNode(PostProcessingEffect* ppe, const int blendMethod, const bool useFloatBuffers) {
+    MergeBlendNode::MergeBlendNode(PostProcessingEffect* ppe, IEngine& engine, const int blendMethod, const bool useFloatBuffers) {
     this->ppe = ppe;
     this->newparentColorTex = ITexture2DPtr(new Texture2D(1, 1, TEX_RGBA , TEX_REPEAT, TEX_REPEAT, TEX_LINEAR, TEX_LINEAR));
     this->newparentDepthTex = ITexture2DPtr(new Texture2D(1, 1, TEX_DEPTH, TEX_REPEAT, TEX_REPEAT, TEX_LINEAR, TEX_LINEAR));
 
-    this->mergeblend1 = new MergeBlend1(ppe->GetViewport(), useFloatBuffers);
+    this->mergeblend1 = new MergeBlend1(ppe->GetViewport(), engine, useFloatBuffers);
     this->mergeblend1->Add(ppe);
     this->mergeblend1->EnableScreenOutput(false);
-    this->mergeblend2 = new MergeBlend2(ppe->GetViewport(), blendMethod, useFloatBuffers);
+    this->mergeblend2 = new MergeBlend2(ppe->GetViewport(), engine, blendMethod, useFloatBuffers);
     this->mergeblend1->Add(mergeblend2);
 }
 
 MergeBlendNode::~MergeBlendNode() {
     delete mergeblend1;
     delete mergeblend2;
-}
-
-void MergeBlendNode::Accept(ISceneNodeVisitor& visitor) {
-    visitor.VisitMergeBlendNode(this);
 }
 
 void MergeBlendNode::ApplyToSubNodes(ISceneNodeVisitor& visitor) {
@@ -62,7 +58,7 @@ void MergeBlendNode::GetParentTextures() {
 
 /* MergeBlend1 class */
 
-MergeBlendNode::MergeBlend1::MergeBlend1(Viewport* viewport, bool useFloatBuffers) : PostProcessingEffect(viewport, useFloatBuffers) {
+    MergeBlendNode::MergeBlend1::MergeBlend1(Viewport* viewport, IEngine& engine, bool useFloatBuffers) : PostProcessingEffect(viewport,engine, useFloatBuffers) {
 }
 
 void MergeBlendNode::MergeBlend1::Setup() {
@@ -93,7 +89,7 @@ void MergeBlendNode::MergeBlend1::SetParameters(ITexture2DPtr parentDepthTex) {
 
 /* MergeBlend2 class */
 
-MergeBlendNode::MergeBlend2::MergeBlend2(Viewport* viewport, int blendMethod, bool useFloatBuffers) : PostProcessingEffect(viewport,useFloatBuffers) {
+    MergeBlendNode::MergeBlend2::MergeBlend2(Viewport* viewport, IEngine& engine, int blendMethod, bool useFloatBuffers) : PostProcessingEffect(viewport,engine,useFloatBuffers) {
     this->blendMethod = blendMethod;
 }
 

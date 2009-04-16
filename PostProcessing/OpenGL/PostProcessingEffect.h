@@ -13,8 +13,9 @@
 #include <Resources/OpenGL/RenderBuffer.h>
 #include <Display/Viewport.h>
 #include <Logging/Logger.h>
-#include <Core/IModule.h>     // to be able to add itself as a module
-#include <Core/IGameEngine.h> // to be able to add itself as a module
+#include <Core/IListener.h>     // to be able to add itself as a module
+#include <Core/IEngine.h>
+//#include <Core/IGameEngine.h> // to be able to add itself as a module
 #include <Meta/OpenGL.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -31,9 +32,11 @@ using namespace OpenEngine::Core;
 /** objects of this class represents a post-processing effect
  *  @author Bjarke N. Laustsen
  */
-class PostProcessingEffect : public IModule, public IPostProcessingEffect {
+class PostProcessingEffect : public IListener<ProcessEventArg>
+    , public IPostProcessingEffect {
 
   private:
+    IEngine& engine;
 
     // max antal color-attachments/texture-units dette grafikkort tillader
     GLint maxColorAttachments;
@@ -87,7 +90,6 @@ class PostProcessingEffect : public IModule, public IPostProcessingEffect {
     ITexture2DPtr finalColorTex; // used by getFinalColorBufferTexture (if any effects are chained, it will be the result after those)
     ITexture2DPtr finalDepthTex; // used by getFinalDepthBufferTexture (if any effects are chained, it will be the result after those)
 
-    PostProcessingEffect() {}
 
     ITexture2DPtr CreateColorTex();
     ITexture2DPtr CreateDepthTex();
@@ -113,7 +115,7 @@ class PostProcessingEffect : public IModule, public IPostProcessingEffect {
 
   public:
 
-    PostProcessingEffect(Viewport* viewport, const bool useFloatTextures = false);
+    PostProcessingEffect(Viewport* viewport, IEngine& engine, const bool useFloatTextures = false);
     virtual ~PostProcessingEffect();
 
     void PreRender();  // call before rendering the screen (to setup FBO)
@@ -162,10 +164,7 @@ class PostProcessingEffect : public IModule, public IPostProcessingEffect {
     Viewport* GetViewport();
 
     /* methods inherited from IModule */
-    void Initialize();
-    void Process(const float deltaTime, const float percent);
-    void Deinitialize();
-    bool IsTypeOf(const std::type_info& inf);
+    void Handle(ProcessEventArg arg);
 };
 
 } // NS PostProcessing

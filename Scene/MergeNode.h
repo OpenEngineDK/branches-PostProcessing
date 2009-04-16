@@ -14,6 +14,7 @@
 #include <PostProcessing/OpenGL/PostProcessingEffect.h>
 #include <Resources/ITexture2D.h>
 #include <Resources/ResourceManager.h>
+#include <Core/IEngine.h>
 
 namespace OpenEngine {
 namespace Scene {
@@ -28,6 +29,7 @@ using namespace OpenEngine::Resources;
  * @author Bjarke N. Laustsen
  */
 class MergeNode : public SceneNode {
+    OE_SCENE_NODE(QuadNode, ISceneNode)
   private:
     PostProcessingEffect* ppe;
     ITexture2DPtr newparentColorTex;
@@ -40,7 +42,7 @@ class MergeNode : public SceneNode {
       private:
         IPostProcessingPass* pass1;
       public:
-	Merge(Viewport* viewport, bool useFloatBuffers);
+        Merge(Viewport* viewport, IEngine& engine, bool useFloatBuffers);
 	void Setup();
 	void PerFrame(const float deltaTime);
 	void SetParameters(ITexture2DPtr parentColorTex, ITexture2DPtr parentDepthTex);
@@ -49,10 +51,9 @@ class MergeNode : public SceneNode {
     Merge* merge;
 
   public:
-    MergeNode(PostProcessingEffect* ppe, const float alpha = 1.0f, const bool useFloatBuffers = false);
+    MergeNode(PostProcessingEffect* ppe, IEngine& engine, const float alpha = 1.0f, const bool useFloatBuffers = false);
     ~MergeNode();
 
-    void Accept(ISceneNodeVisitor& visitor);
     void ApplyToSubNodes(ISceneNodeVisitor& visitor);
 };
 

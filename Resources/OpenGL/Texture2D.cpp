@@ -177,7 +177,7 @@ TexelFormat Texture2D::GetFormat() {
 /** get the width of this texture
  *  @returns the width
  */
-int Texture2D::GetWidth() {
+unsigned int Texture2D::GetWidth() {
     glPushAttrib(GL_TEXTURE_BIT); // remember currently bound 2D-texture (so that this method doesn't give any side effects)
     GLsizei width;
     this->Bind();
@@ -189,7 +189,7 @@ int Texture2D::GetWidth() {
 /** get the height of this texture
  *  @returns the height
  */
-int Texture2D::GetHeight() {
+unsigned int Texture2D::GetHeight() {
     glPushAttrib(GL_TEXTURE_BIT); // remember currently bound 2D-texture (so that this method doesn't give any side effects)
     GLsizei height;
     this->Bind();
@@ -208,7 +208,7 @@ int Texture2D::GetZDepth() {
 /** get the bit-depth of this texture (not z-depth!!!)
  *  @returns the bit-depth
  */
-int Texture2D::GetDepth() {
+unsigned int Texture2D::GetDepth() {
     switch (GetFormat()) {
 	case TEX_DEPTH:           return 24; // could be 16 as well.. can this be detected?
 	case TEX_DEPTH_STENCIL:   return 32;
@@ -220,6 +220,18 @@ int Texture2D::GetDepth() {
 	case TEX_RGBA_FLOAT:	  return 16*4;
 	default:                  throw new PPEResourceException("GetDepth: illegal format");
     }
+}
+
+ColorFormat Texture2D::GetColorFormat() {
+    unsigned int depth = GetDepth();
+    if (depth==32)
+        return RGBA;
+    else if (depth==24)
+        return RGB;
+    else if (depth==8)
+        return LUMINANCE;
+    else
+        throw Exception("unknown color depth");
 }
 
 /** Resize this texture (destructive resize - content will not be preserved)
@@ -301,10 +313,8 @@ GLsizei Texture2D::GetGLHeight(int height) {
     return (GLsizei)height;
 }
 
-
-/* hej */
 TexelFormat Texture2D::GetOEInternalFormat(GLint glInternalFormat) {
-    switch (glInternalFormat) {
+  switch (glInternalFormat) {
 	case GL_DEPTH_COMPONENT:      return TEX_DEPTH;
 	case GL_DEPTH24_STENCIL8_EXT: return TEX_DEPTH_STENCIL;
 	case GL_LUMINANCE8:           return TEX_LUMINANCE;

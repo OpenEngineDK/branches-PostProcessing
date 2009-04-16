@@ -20,4 +20,5 @@ TARGET_LINK_LIBRARIES(Extensions_PostProcessing
   # depending libraries
   OpenEngine_Resources
   OpenEngine_Scene
+  OpenEngine_Display
 )

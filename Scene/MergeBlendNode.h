@@ -14,6 +14,7 @@
 #include <PostProcessing/OpenGL/PostProcessingEffect.h>
 #include <Resources/ITexture2D.h>
 #include <Resources/ResourceManager.h>
+#include <Core/IEngine.h>
 
 namespace OpenEngine {
 namespace Scene {
@@ -28,6 +29,7 @@ using namespace OpenEngine::Resources;
  * @author Bjarke N. Laustsen
  */
 class MergeBlendNode : public SceneNode {
+    OE_SCENE_NODE(QuadNode, ISceneNode)
   private:
     PostProcessingEffect* ppe;
     ITexture2DPtr newparentColorTex;
@@ -41,7 +43,7 @@ class MergeBlendNode : public SceneNode {
         IPostProcessingPass* pass1;
         vector<float> clearcolor;
       public:
-	MergeBlend1(Viewport* viewport, bool useFloatBuffers);
+        MergeBlend1(Viewport* viewport, IEngine& engine, bool useFloatBuffers);
 	void Setup();
 	void PerFrame(const float deltaTime);
 	void SetParameters(ITexture2DPtr parentDepthTex);
@@ -53,7 +55,7 @@ class MergeBlendNode : public SceneNode {
         IPostProcessingPass* pass1;
         int blendMethod;
       public:
-	MergeBlend2(Viewport* viewport, int blendMethod, bool useFloatBuffers);
+        MergeBlend2(Viewport* viewport, IEngine& engine, int blendMethod, bool useFloatBuffers);
 	void Setup();
 	void PerFrame(const float deltaTime);
 	void SetParameters(ITexture2DPtr parentColorTex, ITexture2DPtr parentDepthTex);
@@ -63,10 +65,9 @@ class MergeBlendNode : public SceneNode {
     MergeBlend2* mergeblend2;
 
   public:
-    MergeBlendNode(PostProcessingEffect* ppe, const int blendMethod = 0, const bool useFloatBuffers = false);
+    MergeBlendNode(PostProcessingEffect* ppe, IEngine& engine, const int blendMethod = 0, const bool useFloatBuffers = false);
     ~MergeBlendNode();
 
-    void Accept(ISceneNodeVisitor& visitor);
     void ApplyToSubNodes(ISceneNodeVisitor& visitor);
 };
 

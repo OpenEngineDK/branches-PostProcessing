@@ -18,8 +18,8 @@
 #include <Scene/MergeBlendNode.h>
 
 #include <Geometry/FaceSet.h>
-#include <Renderers/IRenderingView.h>
-#include <Renderers/RenderStateNode.h>
+#include <Renderers/OpenGL/RenderingView.h>
+#include <Scene/RenderStateNode.h>
 #include <vector>
 
 namespace OpenEngine {
@@ -38,30 +38,17 @@ using namespace std;
  * Same as the normal RenderingView except it uses post-processing effects.
  * @author Bjarke N. Laustsen and OECore-team
  */
-class PostProcessingRenderingView : virtual public IRenderingView {
-    IRenderer* renderer;
-    vector<RenderStateNode*> stateStack;
+ class PostProcessingRenderingView : virtual public RenderingView {
     IPostProcessingEffect* ppe;
 
-    void RenderBinormals(FacePtr face);
-    void RenderTangents(FacePtr face);
-    void RenderNormals(FacePtr face);
-    void RenderHardNormal(FacePtr face);
-    void RenderLine(Vector<3,float> vert, Vector<3,float> norm, Vector<3,float> color);
-    bool IsOptionSet(RenderStateNode::RenderStateOption o);
 public:
     PostProcessingRenderingView(Viewport& viewport, IPostProcessingEffect* ppe);
     virtual ~PostProcessingRenderingView();
-    void VisitGeometryNode(GeometryNode* node);
-    void VisitTransformationNode(TransformationNode* node);
-    void VisitRenderStateNode(RenderStateNode* node);
-    void VisitRenderNode(IRenderNode* node);
+
     void VisitBlendNode(BlendNode* node);
     void VisitMergeNode(MergeNode* node);
     void VisitMergeBlendNode(MergeBlendNode* node);
-    void Render(IRenderer* renderer, ISceneNode* root);
-    void Handle(RenderingEventArg arg);
-    IRenderer* GetRenderer();
+
 };
 
 } // NS OpenGL

@@ -195,7 +195,7 @@ TexelFormat TextureCube::GetFormat() {
 /** get the width of this texture
  *  @returns the width
  */
-int TextureCube::GetWidth() {
+unsigned int TextureCube::GetWidth() {
     glPushAttrib(GL_TEXTURE_BIT); // remember currently bound 2D-texture (so that this method doesn't give any side effects)
     GLsizei width;
     this->Bind();
@@ -207,7 +207,7 @@ int TextureCube::GetWidth() {
 /** get the height of this texture
  *  @returns the height
  */
-int TextureCube::GetHeight() {
+unsigned int TextureCube::GetHeight() {
     glPushAttrib(GL_TEXTURE_BIT); // remember currently bound 2D-texture (so that this method doesn't give any side effects)
     GLsizei height;
     this->Bind();
@@ -223,10 +223,22 @@ int TextureCube::GetZDepth() {
     return 0;
 }
 
+ColorFormat TextureCube::GetColorFormat() {
+    unsigned int depth = GetDepth();
+    if (depth==32)
+        return RGBA;
+    else if (depth==24)
+        return RGB;
+    else if (depth==8)
+        return LUMINANCE;
+    else
+        throw Exception("unknown color depth");
+}
+
 /** get the bit-depth of this texture (not z-depth!!!)
  *  @returns the bit-depth
  */
-int TextureCube::GetDepth() {
+unsigned int TextureCube::GetDepth() {
     throw new PPEResourceException("GetDepth: not implemented yet");
     switch (GetFormat()) {
 	case TEX_DEPTH:           return 24; // could be 16 as well.. can this be detected?

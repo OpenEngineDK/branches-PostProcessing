@@ -25,10 +25,10 @@ class IRenderBuffer : public IImage {
 
     virtual PixelFormat GetFormat() = 0;
 
-    virtual int GetWidth() = 0;
-    virtual int GetHeight() = 0;
+    virtual unsigned int GetWidth() = 0;
+    virtual unsigned int GetHeight() = 0;
     virtual int GetZDepth() = 0; // <-. to make it work with ITextureResource, we can't call it getDepth :(
-    virtual int GetDepth() = 0; // <- this is NOT the image-depth, but instead the bit-depth of each pixel. :( (to make OE happy)
+    virtual unsigned int GetDepth() = 0; // <- this is NOT the image-depth, but instead the bit-depth of each pixel. :( (to make OE happy)
 
     // lav også en resize der kopiere billedet med.
     /* destructing resizes - on resize image content will be destructed and has to be reloaded */
