@@ -26,7 +26,7 @@ FramebufferObject::FramebufferObject() {
 
     // init maxNumColorAttachments
     glGetIntegerv(GL_MAX_DRAW_BUFFERS, &maxNumColorAttachments);
-    if (maxNumColorAttachments > 16) throw new PPEResourceException("specs have changed");
+    if (maxNumColorAttachments > 16) throw PPEResourceException("specs have changed");
 
     // init list of attached objects
     for (int i=0; i<16; i++) colorAttachments[i].reset();
@@ -62,15 +62,15 @@ void FramebufferObject::Unbind() {
  * @exception PPEResourceException thrown if the supplied renderbuffer doesn't doesn't have a color internal format
  */
 void FramebufferObject::AttachColorRenderBuffer(IRenderBufferPtr rb, int attachmentPoint) {
-    if (attachmentPoint < 0 || attachmentPoint >= maxNumColorAttachments) throw new PPEResourceException("illegal attachmentPoint");
-    if (rb->GetFormat()!=RB_RGB && rb->GetFormat()!=RB_RGBA) throw new PPEResourceException("non-color renderbuffers can't be attached as color attachments");
+    if (attachmentPoint < 0 || attachmentPoint >= maxNumColorAttachments) throw PPEResourceException("illegal attachmentPoint");
+    if (rb->GetFormat()!=RB_RGB && rb->GetFormat()!=RB_RGBA) throw PPEResourceException("non-color renderbuffers can't be attached as color attachments");
 
     GuardedBind();
     glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, colorAttachmentEnums[attachmentPoint], GL_RENDERBUFFER_EXT, rb->GetID());
 
     // check if it really got attached (i'm not quite sure that all FBO-errors means that it didn't get attached, so that's why i'm not simply checking for errors here)
     if (GetAttachmentType(colorAttachmentEnums[attachmentPoint]) != GL_RENDERBUFFER_EXT || GetAttachmentID(colorAttachmentEnums[attachmentPoint]) != rb->GetID())
-	{GuardedUnbind(); throw new PPEResourceException("attaching failed");} // maybe it should not cast an exception..
+	{GuardedUnbind(); throw PPEResourceException("attaching failed");} // maybe it should not cast an exception..
     else
         colorAttachments[attachmentPoint] = rb;
 
@@ -82,14 +82,14 @@ void FramebufferObject::AttachColorRenderBuffer(IRenderBufferPtr rb, int attachm
  * @exception PPEResourceException thrown if the supplied renderbuffer doesn't doesn't have a depth internal format
  */
 void FramebufferObject::AttachDepthRenderBuffer(IRenderBufferPtr rb) {
-    if (rb->GetFormat()!=RB_DEPTH) throw new PPEResourceException("non-depth renderbuffers can't be attached as depth attachments");
+    if (rb->GetFormat()!=RB_DEPTH) throw PPEResourceException("non-depth renderbuffers can't be attached as depth attachments");
 
     GuardedBind();
     glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, rb->GetID());
 
     // check if it really got attached (i'm not quite sure that all FBO-errors means that it didn't get attached, so that's why i'm not simply checking for errors here)
     if (GetAttachmentType(GL_DEPTH_ATTACHMENT_EXT) != GL_RENDERBUFFER_EXT || GetAttachmentID(GL_DEPTH_ATTACHMENT_EXT) != rb->GetID())
-	{GuardedUnbind(); throw new PPEResourceException("attaching failed");}// maybe it should not cast an exception..
+	{GuardedUnbind(); throw PPEResourceException("attaching failed");}// maybe it should not cast an exception..
     else
         depthAttachment = rb;
 
@@ -101,14 +101,14 @@ void FramebufferObject::AttachDepthRenderBuffer(IRenderBufferPtr rb) {
  * @exception PPEResourceException thrown if the supplied renderbuffer doesn't doesn't have a stencil internal format
  */
 void FramebufferObject::AttachStencilRenderBuffer(IRenderBufferPtr rb) {
-    if (rb->GetFormat()!=RB_STENCIL) throw new PPEResourceException("non-stencil renderbuffers can't be attached as stencil attachments");
+    if (rb->GetFormat()!=RB_STENCIL) throw PPEResourceException("non-stencil renderbuffers can't be attached as stencil attachments");
 
     GuardedBind();
     glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_STENCIL_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, rb->GetID());
 
     // check if it really got attached (i'm not quite sure that all FBO-errors means that it didn't get attached, so that's why i'm not simply checking for errors here)
     if (GetAttachmentType(GL_STENCIL_ATTACHMENT_EXT) != GL_RENDERBUFFER_EXT || GetAttachmentID(GL_STENCIL_ATTACHMENT_EXT) != rb->GetID())
-	{GuardedUnbind(); throw new PPEResourceException("attaching failed");}// maybe it should not cast an exception..
+	{GuardedUnbind(); throw PPEResourceException("attaching failed");}// maybe it should not cast an exception..
     else
         stencilAttachment = rb;
 
@@ -122,16 +122,16 @@ void FramebufferObject::AttachStencilRenderBuffer(IRenderBufferPtr rb) {
  * @exception PPEResourceException thrown if the supplied texture doesn't doesn't have a color internal format
  */
 void FramebufferObject::AttachColorTexture(ITexture2DPtr tex, int attachmentPoint) {
-    if (attachmentPoint < 0 || attachmentPoint >= maxNumColorAttachments) throw new PPEResourceException("illegal attachmentPoint");
+    if (attachmentPoint < 0 || attachmentPoint >= maxNumColorAttachments) throw PPEResourceException("illegal attachmentPoint");
     if (tex->GetFormat()!=TEX_RGB && tex->GetFormat()!=TEX_RGBA && tex->GetFormat()!=TEX_RGB_FLOAT && tex->GetFormat()!=TEX_RGBA_FLOAT)
-        throw new PPEResourceException("non-color textures can't be attached as color attachments");
+        throw PPEResourceException("non-color textures can't be attached as color attachments");
 
     GuardedBind();
     glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, colorAttachmentEnums[attachmentPoint], GL_TEXTURE_2D, tex->GetID(), 0);
 
     // check if it really got attached (i'm not quite sure that all FBO-errors means that it didn't get attached, so that's why i'm not simply checking for errors here)
     if (GetAttachmentType(colorAttachmentEnums[attachmentPoint]) != GL_TEXTURE || GetAttachmentID(colorAttachmentEnums[attachmentPoint]) != tex->GetID())
-	{GuardedUnbind(); throw new PPEResourceException("attaching failed");}// maybe it should not cast an exception..
+	{GuardedUnbind(); throw PPEResourceException("attaching failed");}// maybe it should not cast an exception..
     else
         colorAttachments[attachmentPoint] = tex;
 
@@ -143,14 +143,14 @@ void FramebufferObject::AttachColorTexture(ITexture2DPtr tex, int attachmentPoin
  * @exception PPEResourceException thrown if the supplied texture doesn't doesn't have a depth internal format
  */
 void FramebufferObject::AttachDepthTexture(ITexture2DPtr tex) {
-    if (tex->GetFormat()!=TEX_DEPTH && tex->GetFormat()!=TEX_DEPTH_STENCIL) throw new PPEResourceException("non-depth textures can't be attached as depth attachments");
+    if (tex->GetFormat()!=TEX_DEPTH && tex->GetFormat()!=TEX_DEPTH_STENCIL) throw PPEResourceException("non-depth textures can't be attached as depth attachments");
 
     GuardedBind();
     glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_TEXTURE_2D, tex->GetID(), 0);
 
     // check if it really got attached (i'm not quite sure that all FBO-errors means that it didn't get attached, so that's why i'm not simply checking for errors here)
     if (GetAttachmentType(GL_DEPTH_ATTACHMENT_EXT) != GL_TEXTURE || GetAttachmentID(GL_DEPTH_ATTACHMENT_EXT) != tex->GetID())
-	{GuardedUnbind(); throw new PPEResourceException("attaching failed");}// maybe it should not cast an exception..
+	{GuardedUnbind(); throw PPEResourceException("attaching failed");}// maybe it should not cast an exception..
     else
         depthAttachment = tex;
 
@@ -162,14 +162,14 @@ void FramebufferObject::AttachDepthTexture(ITexture2DPtr tex) {
  * @exception PPEResourceException thrown if the supplied texture doesn't doesn't have a stencil internal format
  */
 void FramebufferObject::AttachStencilTexture(ITexture2DPtr tex) {
-    if (tex->GetFormat()!=TEX_DEPTH_STENCIL) throw new PPEResourceException("non-stencil textures can't be attached as stencil attachments");
+    if (tex->GetFormat()!=TEX_DEPTH_STENCIL) throw PPEResourceException("non-stencil textures can't be attached as stencil attachments");
 
     GuardedBind();
     glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_STENCIL_ATTACHMENT_EXT, GL_TEXTURE_2D, tex->GetID(), 0);
 
     // check if it really got attached (i'm not quite sure that all FBO-errors means that it didn't get attached, so that's why i'm not simply checking for errors here)
     if (GetAttachmentType(GL_STENCIL_ATTACHMENT_EXT) != GL_TEXTURE || GetAttachmentID(GL_STENCIL_ATTACHMENT_EXT) != tex->GetID())
-	{GuardedUnbind(); throw new PPEResourceException("attaching failed");}// maybe it should not cast an exception..
+	{GuardedUnbind(); throw PPEResourceException("attaching failed");}// maybe it should not cast an exception..
     else
         stencilAttachment = tex;
 
@@ -180,7 +180,7 @@ void FramebufferObject::AttachStencilTexture(ITexture2DPtr tex) {
  * @exception PPEResourceException thrown if illegal attachmentPoint (less than 0 or grater than FramebufferObject::GetMaxNumColorAttachments)
  */
 void FramebufferObject::DetachColorAttachment(int attachmentPoint) {
-    if (attachmentPoint < 0 || attachmentPoint >= maxNumColorAttachments) throw new PPEResourceException("illegal attachmentPoint");
+    if (attachmentPoint < 0 || attachmentPoint >= maxNumColorAttachments) throw PPEResourceException("illegal attachmentPoint");
     GuardedBind();
     glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, colorAttachmentEnums[attachmentPoint], GL_RENDERBUFFER_EXT, 0);
     colorAttachments[attachmentPoint].reset();
@@ -230,12 +230,12 @@ bool FramebufferObject::CheckFrameBufferStatus() {
 	    break;
 	case GL_FRAMEBUFFER_UNSUPPORTED_EXT:
 	    /* hardware dependent error - choose different formats */
-	    //throw new PPEResourceException("FramebufferObject: framebuffer unsupported! choose different formats (hardware dependent)");
+	    //throw PPEResourceException("FramebufferObject: framebuffer unsupported! choose different formats (hardware dependent)");
 	    return false;
 	    break;
 	default:
 	    /* programming error; will fail on all hardware */
-	    throw new PPEResourceException("FramebufferObject: error!");
+	    throw PPEResourceException("FramebufferObject: error!");
 	    return false;
 	    break;
     }
@@ -267,7 +267,7 @@ GLuint FramebufferObject::GetAttachmentID(GLenum attachmentEnum) {
  * @exception PPEResourceException thrown if illegal attachmentPoint (less than 0 or grater than FramebufferObject::GetMaxNumColorAttachments)
  */
 IImagePtr FramebufferObject::GetColorAttachment(int attachmentPoint) {
-    if (attachmentPoint < 0 || attachmentPoint >= maxNumColorAttachments) throw new PPEResourceException("illegal attachmentPoint");
+    if (attachmentPoint < 0 || attachmentPoint >= maxNumColorAttachments) throw PPEResourceException("illegal attachmentPoint");
     return colorAttachments[attachmentPoint];
 }
 
@@ -309,11 +309,11 @@ void FramebufferObject::SelectDrawBuffers() {
 // (evt. også hav version for array)
 // (note: hører til fbo'en, så den behøver ikke sættes hele tiden (efter hver bind). Se specs linie 5358)
 void FramebufferObject::SelectDrawBuffers(int attachmentPoint) {
-    if (attachmentPoint < 0 || attachmentPoint >= maxNumColorAttachments) throw new PPEResourceException("illegal attachmentPoint");
+    if (attachmentPoint < 0 || attachmentPoint >= maxNumColorAttachments) throw PPEResourceException("illegal attachmentPoint");
 
     GuardedBind();
 
-    if (GetAttachmentID(colorAttachmentEnums[attachmentPoint]) == 0) {GuardedUnbind(); throw new PPEResourceException("nothing attached at attachmentPoint");}
+    if (GetAttachmentID(colorAttachmentEnums[attachmentPoint]) == 0) {GuardedUnbind(); throw PPEResourceException("nothing attached at attachmentPoint");}
 
     GLenum* drawbuffers = new GLenum[maxNumColorAttachments];
     for (int i=0; i<maxNumColorAttachments; i++) {
@@ -330,7 +330,7 @@ void FramebufferObject::SelectDrawBuffers(int attachmentPoint) {
 
 
 void FramebufferObject::GuardedBind()  {
-    if (savedFboID != 0) throw new PPEResourceException("internal error"); // to prevent recursive-ish routines messing up the guardedBind
+    if (savedFboID != 0) throw PPEResourceException("internal error"); // to prevent recursive-ish routines messing up the guardedBind
     glGetIntegerv(GL_FRAMEBUFFER_BINDING_EXT, &savedFboID);
     if (fboID != (GLuint)savedFboID) // no need to bind if this FBO is already bound
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fboID);

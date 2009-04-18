@@ -1,5 +1,7 @@
 #include "PostProcessingEffect.h"
 
+#include <Meta/OpenGL.h>
+
 /* @author Bjarke N. Laustsen
  */
 namespace OpenEngine {
@@ -68,20 +70,25 @@ PostProcessingEffect::~PostProcessingEffect() {
 
 // create FBO, FBO-textures, renderbuffers (also called on screen-resize to resize textures and renderbuffers (<- NO!! NOT ANYMORE!))
 void PostProcessingEffect::SetupFBO() {
+    CHECK_FOR_GL_ERROR();
 
     glGetIntegerv(GL_MAX_DRAW_BUFFERS, &(this->maxColorAttachments));
     glGetIntegerv(GL_MAX_TEXTURE_UNITS, &(this->maxTextureUnits));
+    CHECK_FOR_GL_ERROR();
 
     fbo       = new FramebufferObject(); // <- the fbo used for "render user-screen" (not for the passes)
     depthTex1 = CreateDepthTex();
     depthTex2 = CreateDepthTex();
     colorTex1 = CreateColorTex();
     colorTex2 = CreateColorTex();
+    CHECK_FOR_GL_ERROR();
 
     fbo->AttachColorTexture(colorTex1, 0);
     fbo->AttachDepthTexture(depthTex1);
+    CHECK_FOR_GL_ERROR();
 
     fbo->SelectDrawBuffers();
+    CHECK_FOR_GL_ERROR();
 }
 
 
@@ -120,41 +127,49 @@ void PostProcessingEffect::PreRender() {
 
 void PostProcessingEffect::PreRender(bool bindFbo) {
 
+    CHECK_FOR_GL_ERROR();
     // check for chain inf-loop
-    if (infLoopDetectionBit == 1) throw new PostProcessingException("chain inf-loop detected");
+    if (infLoopDetectionBit == 1) throw PostProcessingException("chain inf-loop detected");
 
     // setup on first frame on this PPE and all chained PPEs (also new PPEs which might have been added since last frame)
     CallSetup();
+    CHECK_FOR_GL_ERROR();
 
 
      // check if viewport has been resized. If so, resize all buffers (incl. chained)
     if (viewport->GetDimension()[2] != currScreenWidth || viewport->GetDimension()[3] != currScreenHeight)
         Resize(viewport->GetDimension()[2], viewport->GetDimension()[3]);
+    CHECK_FOR_GL_ERROR();
 
     // don't need to clear normal framebuffer buffers, since they will completely be overwritten (faster!)
 
     // if any PPEs are chained to this one, call PerFrame on them as well (but don't bind their fbo) (must be done after CallSetup())
+    CHECK_FOR_GL_ERROR();
     for (unsigned int i=0; i<chainedEffects.size(); i++) {
-	PostProcessingEffect* ppe = chainedEffects.at(i);
-	ppe->PreRender(false);
+        PostProcessingEffect* ppe = chainedEffects.at(i);
+        ppe->PreRender(false);
     }
+    CHECK_FOR_GL_ERROR();
 
     // bind the fbo the userscreen should be rendered to
     if (bindFbo) {
 
 	// remember the currently bound fbo, so we can restore it again after postRender (can't be done with pushAttrib())
-      if (savedFboID != 0) throw new PostProcessingException("internal error");
+    if (savedFboID != 0) throw PostProcessingException("internal error");
 	glGetIntegerv(GL_FRAMEBUFFER_BINDING_EXT, &savedFboID);
+    CHECK_FOR_GL_ERROR();
 
 	// bind fbo for "render user-screen"
 	fbo->Bind();
+    CHECK_FOR_GL_ERROR();
 
 	// clear done here since its not done in rendering view, and has to be done _after_ the fbo is bound.
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
     }
 
     // check if all went well
-    CheckGLErrors("preRender");
+    CHECK_FOR_GL_ERROR();
+    //CheckGLErrors("preRender");
 }
 
 /** Call after rendering the screen (to apply postprocessing effects to the rendered screen)
@@ -294,7 +309,7 @@ IPostProcessingPass* PostProcessingEffect::AddPass(string fpFileName) {
  *  @return the PostProcessingPass-object corresponding to this pass
  */
 IPostProcessingPass* PostProcessingEffect::AddPass(vector<string> fpFileNames) {
-    if (!satup) throw new PostProcessingException("method AddPass called before setup");
+    if (!satup) throw PostProcessingException("method AddPass called before setup");
 
     glPushAttrib(GL_ALL_ATTRIB_BITS);
 
@@ -315,7 +330,7 @@ IPostProcessingPass* PostProcessingEffect::AddPass(vector<string> fpFileNames) {
  *  @param[in] currScreenHeight the new height of the screen
  */
 void PostProcessingEffect::Resize(int currScreenWidth, int currScreenHeight) {
-    if (!satup) throw new PostProcessingException("method Resize called before setup");
+    if (!satup) throw PostProcessingException("method Resize called before setup");
 
     glPushAttrib(GL_ALL_ATTRIB_BITS);
 
@@ -353,8 +368,8 @@ void PostProcessingEffect::Swap(ITexture2DPtr* a, ITexture2DPtr* b) {
  *  @exception PostProcessingException if called before the first frame
  */
 void PostProcessingEffect::GetFinalColorBuffer(ITexture2DPtr texCopy) {
-    if (!satup) throw new PostProcessingException("method GetFinalColorBuffer called before setup");
-    if (texCopy.get() == NULL || finalColorTex.get() == NULL) throw new PostProcessingException("can't be called before first frame");
+    if (!satup) throw PostProcessingException("method GetFinalColorBuffer called before setup");
+    if (texCopy.get() == NULL || finalColorTex.get() == NULL) throw PostProcessingException("can't be called before first frame");
     // note: this will work for chained as well, since finalColorTexID contains the final one after all chained effects
     finalColorTex->Clone(texCopy);
 }
@@ -367,8 +382,8 @@ void PostProcessingEffect::GetFinalColorBuffer(ITexture2DPtr texCopy) {
  *  @exception PostProcessingException if called before the first frame
  */
 void PostProcessingEffect::GetFinalDepthBuffer(ITexture2DPtr texCopy) {
-    if (!satup) throw new PostProcessingException("method GetFinalDepthBuffer called before setup");
-    if (texCopy.get() == NULL || finalDepthTex.get() == NULL) throw new PostProcessingException("can't be called before first frame");
+    if (!satup) throw PostProcessingException("method GetFinalDepthBuffer called before setup");
+    if (texCopy.get() == NULL || finalDepthTex.get() == NULL) throw PostProcessingException("can't be called before first frame");
     // note: this will work for chained as well, since finalDepthTexID contains the final one after all chained effects
     finalDepthTex->Clone(texCopy);
 }
@@ -380,8 +395,8 @@ void PostProcessingEffect::GetFinalDepthBuffer(ITexture2DPtr texCopy) {
  *  @exception PostProcessingException if called before the first frame
  */
 ITexture2DPtr PostProcessingEffect::GetFinalColorBuffer() {
-    if (!satup) throw new PostProcessingException("method GetFinalColorBuffer called before setup");
-    if (finalColorTex.get() == NULL) throw new PostProcessingException("can't be called before first frame");
+    if (!satup) throw PostProcessingException("method GetFinalColorBuffer called before setup");
+    if (finalColorTex.get() == NULL) throw PostProcessingException("can't be called before first frame");
     // note: this will work for chained as well, since finalColorTexID contains the final one after all chained effects
     return finalColorTex->Clone();
 }
@@ -393,8 +408,8 @@ ITexture2DPtr PostProcessingEffect::GetFinalColorBuffer() {
  *  @exception PostProcessingException if called before the first frame
  */
 ITexture2DPtr PostProcessingEffect::GetFinalDepthBuffer() {
-    if (!satup) throw new PostProcessingException("method GetFinalDepthBuffer called before setup");
-    if (finalDepthTex.get() == NULL) throw new PostProcessingException("can't be called before first frame");
+    if (!satup) throw PostProcessingException("method GetFinalDepthBuffer called before setup");
+    if (finalDepthTex.get() == NULL) throw PostProcessingException("can't be called before first frame");
     // note: this will work for chained as well, since finalDepthTexID contains the final one after all chained effects
     return finalDepthTex->Clone();
 }
@@ -411,8 +426,8 @@ ITexture2DPtr PostProcessingEffect::GetFinalDepthBuffer() {
  *  @exception PostProcessingException if called before the first frame
  */
 ITexture2DPtr PostProcessingEffect::GetFinalColorBufferRef() {
-    if (!satup) throw new PostProcessingException("method GetFinalColorBufferRef called before setup");
-    if (finalColorTex.get() == NULL) throw new PostProcessingException("can't be called before first frame");
+    if (!satup) throw PostProcessingException("method GetFinalColorBufferRef called before setup");
+    if (finalColorTex.get() == NULL) throw PostProcessingException("can't be called before first frame");
     // note: this will work for chained as well, since finalColorTexID contains the final one after all chained effects
     return finalColorTex;
 }
@@ -429,8 +444,8 @@ ITexture2DPtr PostProcessingEffect::GetFinalColorBufferRef() {
  *  @exception PostProcessingException if called before the first frame
  */
 ITexture2DPtr PostProcessingEffect::GetFinalDepthBufferRef() {
-    if (!satup) throw new PostProcessingException("method GetFinalDepthBufferRef called before setup");
-    if (finalDepthTex.get() == NULL) throw new PostProcessingException("can't be called before first frame");
+    if (!satup) throw PostProcessingException("method GetFinalDepthBufferRef called before setup");
+    if (finalDepthTex.get() == NULL) throw PostProcessingException("can't be called before first frame");
     // note: this will work for chained as well, since finalDepthTexID contains the final one after all chained effects
     return finalDepthTex;
 }
@@ -450,7 +465,7 @@ void PostProcessingEffect::EnableScreenOutput(bool enable) {
  *  @return da numbah
  */
 int PostProcessingEffect::GetMaxColorAttachments() {
-    if (!satup) throw new PostProcessingException("method GetMaxColorAttachments called before setup");
+    if (!satup) throw PostProcessingException("method GetMaxColorAttachments called before setup");
     return maxColorAttachments;
 }
 
@@ -458,7 +473,7 @@ int PostProcessingEffect::GetMaxColorAttachments() {
  *  @return da numbah
  */
 int PostProcessingEffect::GetMaxTextureBindings() {
-    if (!satup) throw new PostProcessingException("method GetMaxTextureBindings() called before setup");
+    if (!satup) throw PostProcessingException("method GetMaxTextureBindings() called before setup");
     return maxTextureUnits;
 }
 
@@ -555,7 +570,9 @@ void PostProcessingEffect::CallSetup() {
     if (!satup) {
 	satup = true;
 	SetupFBO();
+    CHECK_FOR_GL_ERROR();
 	Setup();
+    CHECK_FOR_GL_ERROR();
     }
 }
 
@@ -567,7 +584,7 @@ void PostProcessingEffect::CallSetup() {
  *  @exception PostProcessingException thrown if called before first frame
  */
 void PostProcessingEffect::SetColorBufferWrap(TextureWrap wrapS, TextureWrap wrapT) {
-    if (!satup) throw new PostProcessingException("method SetColorBufferWrap called before setup");
+    if (!satup) throw PostProcessingException("method SetColorBufferWrap called before setup");
     colorTex1->SetWrapS(wrapS);
     colorTex1->SetWrapT(wrapT);
     colorTex2->SetWrapS(wrapS);
@@ -581,7 +598,7 @@ void PostProcessingEffect::SetColorBufferWrap(TextureWrap wrapS, TextureWrap wra
  *  @exception PostProcessingException thrown if called before first frame
  */
 void PostProcessingEffect::SetDepthBufferWrap(TextureWrap wrapS, TextureWrap wrapT) {
-    if (!satup) throw new PostProcessingException("method SetDepthBufferWrap called before setup");
+    if (!satup) throw PostProcessingException("method SetDepthBufferWrap called before setup");
     depthTex1->SetWrapS(wrapS);
     depthTex1->SetWrapT(wrapT);
     depthTex2->SetWrapS(wrapS);
@@ -595,7 +612,7 @@ void PostProcessingEffect::SetDepthBufferWrap(TextureWrap wrapS, TextureWrap wra
  *  @note at the moment we have no use for setting mag or min filters seperately
  */
 void PostProcessingEffect::SetColorBufferFilter(TextureFilter filter) {
-    if (!satup) throw new PostProcessingException("method SetColorBufferFilter called before setup");
+    if (!satup) throw PostProcessingException("method SetColorBufferFilter called before setup");
     colorTex1->SetMagFilter(filter);
     colorTex1->SetMinFilter(filter);
     colorTex2->SetMagFilter(filter);
@@ -609,7 +626,7 @@ void PostProcessingEffect::SetColorBufferFilter(TextureFilter filter) {
  *  @note at the moment we have no use for setting mag or min filters seperately
  */
 void PostProcessingEffect::SetDepthBufferFilter(TextureFilter filter) {
-    if (!satup) throw new PostProcessingException("method SetDepthBufferFilter called before setup");
+    if (!satup) throw PostProcessingException("method SetDepthBufferFilter called before setup");
     depthTex1->SetMagFilter(filter);
     depthTex1->SetMinFilter(filter);
     depthTex2->SetMagFilter(filter);

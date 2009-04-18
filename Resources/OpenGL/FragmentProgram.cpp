@@ -28,7 +28,7 @@ FragmentProgram::FragmentProgram(string filename){
  * @param[in] filenames the filenames of the files containing the GLSL fragmentprogram sourcecode
  */
 FragmentProgram::FragmentProgram(vector<string> filenames) {
-    if (filenames.size() == 0) throw new PPEResourceException("list of filenames was empty");
+    if (filenames.size() == 0) throw PPEResourceException("list of filenames was empty");
     ConstructorSetup(filenames);
 }
 
@@ -81,7 +81,7 @@ void FragmentProgram::SetupFragmentProgram(vector<string> filenames) {
 	GLint shaderCompileOk;
 	glGetShaderiv (shaderID , GL_COMPILE_STATUS, &shaderCompileOk);
 	if (!shaderCompileOk)
-	     throw new PPEResourceException("error compiling shader");
+	     throw PPEResourceException("error compiling shader");
 	     //printf("error compiling shader-source %s\n",filename);
 	*/
     }
@@ -113,7 +113,7 @@ void FragmentProgram::SetupFragmentProgram(vector<string> filenames) {
     GLint programLinkOk;
     glGetProgramiv(programID, GL_LINK_STATUS   , &programLinkOk);
     if (!programLinkOk)
-        throw new PPEResourceException("shader linking error");
+        throw PPEResourceException("shader linking error");
     */
 }
 
@@ -125,7 +125,7 @@ string FragmentProgram::LoadString(string filename) {
 
     if (fp == NULL) {
         logger.error << filename << logger.end;
-	throw new PPEResourceException("error opening shader");
+	throw PPEResourceException("error opening shader");
     }
 
     fseek(fp, 0, SEEK_END);
@@ -137,7 +137,7 @@ string FragmentProgram::LoadString(string filename) {
     str[reallen] = '\0';
 
     if (ferror(fp))
-	throw new PPEResourceException("error loading shader");
+	throw PPEResourceException("error loading shader");
 
     fclose(fp);
 
@@ -181,14 +181,14 @@ void FragmentProgram::BindInt(string parameterName, vector<vector<int> > intvect
     if (intvectors.size() == 0) return;
 
     int vectorsize = intvectors.at(0).size();
-    if (vectorsize < 1 || vectorsize > 4) throw new PPEResourceException("GLSL doesn't have a ivecX type, with the supplied X!");
+    if (vectorsize < 1 || vectorsize > 4) throw PPEResourceException("GLSL doesn't have a ivecX type, with the supplied X!");
 
     // create a C array of all the intvector-values (to be supplied to OpenGL)
       GLint* intarray = new GLint[vectorsize * intvectors.size()];
 
     for (unsigned int i=0; i<intvectors.size(); i++) {
         vector<int> intvector = intvectors.at(i);
-	if (intvector.size() != vectorsize) throw new PPEResourceException("all vectors in an array must have the same size!");
+	if (intvector.size() != vectorsize) throw PPEResourceException("all vectors in an array must have the same size!");
 	for (unsigned int j=0; j<vectorsize; j++)
 	    intarray[i*vectorsize + j] = intvector.at(j);
     }
@@ -236,14 +236,14 @@ void FragmentProgram::BindFloat(string parameterName, vector<vector<float> > flo
     if (floatvectors.size() == 0) return;
 
     int vectorsize = floatvectors.at(0).size();
-    if (vectorsize < 1 || vectorsize > 4) throw new PPEResourceException("GLSL doesn't have a vecX type, with the supplied X!");
+    if (vectorsize < 1 || vectorsize > 4) throw PPEResourceException("GLSL doesn't have a vecX type, with the supplied X!");
 
     // create a C array of all the floatvector-values (to be supplied to OpenGL)
     float* floatarray = new float[vectorsize * floatvectors.size()];
 
     for (unsigned int i=0; i<floatvectors.size(); i++) {
         vector<float> floatvector = floatvectors.at(i);
-	if (floatvector.size() != vectorsize) throw new PPEResourceException("all vectors in an array must have the same size!");
+	if (floatvector.size() != vectorsize) throw PPEResourceException("all vectors in an array must have the same size!");
 	for (unsigned int j=0; j<vectorsize; j++)
 	    floatarray[i*vectorsize + j] = floatvector.at(j);
     }
@@ -292,16 +292,16 @@ void FragmentProgram::BindMatrix(string parameterName, int n, int m, vector<vect
 
     int matrixsize = floatmatrices.at(0).size(); // num entries in each matrix
     logger.info << "n: " << n << " m: " << m << logger.end;
-    if (matrixsize != n*m) throw new PPEResourceException("supplied vector-size doesn't match supplied dimensions!");
-    if (n<2 || n>4 || m<2 || m>4) throw new PPEResourceException("unsupported dimensions!");
-    if (n != m) throw new PPEResourceException("dimensions not equal!");
+    if (matrixsize != n*m) throw PPEResourceException("supplied vector-size doesn't match supplied dimensions!");
+    if (n<2 || n>4 || m<2 || m>4) throw PPEResourceException("unsupported dimensions!");
+    if (n != m) throw PPEResourceException("dimensions not equal!");
 
     // create a C array of all the floatmatrix-entries (to be supplied to OpenGL)
     float* floatarray = new float[matrixsize * floatmatrices.size()];
 
     for (unsigned int i=0; i<floatmatrices.size(); i++) {
         vector<float> floatmatrix = floatmatrices.at(i);
-	if (floatmatrix.size() != matrixsize) throw new PPEResourceException("all matrices in an array must have the same size!");
+	if (floatmatrix.size() != matrixsize) throw PPEResourceException("all matrices in an array must have the same size!");
 	for (unsigned int j=0; j<matrixsize; j++)
 	    floatarray[i*matrixsize + j] = floatmatrix.at(j);
     }
@@ -340,7 +340,7 @@ void FragmentProgram::BindMatrix(string parameterName, int n, int m, vector<vect
  *  @note must be called _before_ binding the fragment program to have any effect (not while it is bound)
  */
 void FragmentProgram::BindTexture(string parameterName, ITextureResourcePtr texture) {
-    if (texture.get() == NULL) throw new PPEResourceException("texture was NULL"); // or should it unbind?
+    if (texture.get() == NULL) throw PPEResourceException("texture was NULL"); // or should it unbind?
 
     // TODO: check if parameter-name exists in the fragment program
 
@@ -387,7 +387,7 @@ void FragmentProgram::SetupTextureUnits() {
 
 
 void FragmentProgram::GuardedBind()  {
-    if (savedProgID != 0) throw new PPEResourceException("guardedBind: internal error"); // to prevent recursive-ish routines messing up the guardedBind
+    if (savedProgID != 0) throw PPEResourceException("guardedBind: internal error"); // to prevent recursive-ish routines messing up the guardedBind
     glGetIntegerv(GL_CURRENT_PROGRAM, &savedProgID);
     if (programID != (GLuint)savedProgID) // no need to bind if this program is already bound
          glUseProgram(programID);

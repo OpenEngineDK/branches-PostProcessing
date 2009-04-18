@@ -64,7 +64,7 @@ int TextureCube::GetID() {
  *  @param texID handle
  */
 void TextureCube::SetID(int texID) {
-    if (texID <= 0) throw new PPEResourceException("texID was <= 0");
+    if (texID <= 0) throw PPEResourceException("texID was <= 0");
     this->texID = texID;
 }
 
@@ -239,7 +239,7 @@ ColorFormat TextureCube::GetColorFormat() {
  *  @returns the bit-depth
  */
 unsigned int TextureCube::GetDepth() {
-    throw new PPEResourceException("GetDepth: not implemented yet");
+    throw PPEResourceException("GetDepth: not implemented yet");
     switch (GetFormat()) {
 	case TEX_DEPTH:           return 24; // could be 16 as well.. can this be detected?
 	case TEX_DEPTH_STENCIL:   return 32;
@@ -249,7 +249,7 @@ unsigned int TextureCube::GetDepth() {
 	case TEX_LUMINANCE_FLOAT: return 16;
 	case TEX_RGB_FLOAT:	  return 16*3;
 	case TEX_RGBA_FLOAT:	  return 16*4;
-	default:                  throw new PPEResourceException("GetDepth: illegal format");
+	default:                  throw PPEResourceException("GetDepth: illegal format");
     }
 }
 
@@ -287,7 +287,7 @@ GLint TextureCube::GetGLInternalFormat(TexelFormat format) {
 	case TEX_LUMINANCE_FLOAT: return GL_LUMINANCE16F_ARB;
 	case TEX_RGB_FLOAT:	  return GL_RGB16F_ARB;
 	case TEX_RGBA_FLOAT:	  return GL_RGBA16F_ARB;
-	default:                  throw new PPEResourceException("getGLInternalFormat: illegal format");
+	default:                  throw PPEResourceException("getGLInternalFormat: illegal format");
     }
 }
 
@@ -301,7 +301,7 @@ GLenum TextureCube::GetGLFormat(TexelFormat format) {
 	case TEX_LUMINANCE_FLOAT: return GL_LUMINANCE;
 	case TEX_RGB_FLOAT:	  return GL_RGB;
 	case TEX_RGBA_FLOAT:	  return GL_RGBA;
-	default:                  throw new PPEResourceException("getGLFormat: illegal format");
+	default:                  throw PPEResourceException("getGLFormat: illegal format");
     }
 }
 
@@ -312,7 +312,7 @@ GLint TextureCube::GetGLWrap(TextureWrap wrap) {
 	case TEX_CLAMP_TO_BORDER: return GL_CLAMP_TO_BORDER;
 	case TEX_REPEAT:	  return GL_REPEAT;
 	case TEX_MIRRORED_REPEAT: return GL_MIRRORED_REPEAT;
-	default:                  throw new PPEResourceException("illegal wrap");
+	default:                  throw PPEResourceException("illegal wrap");
     }
 }
 
@@ -320,7 +320,7 @@ GLint TextureCube::GetGLFilter(TextureFilter filter) {
     switch (filter) {
 	case TEX_NEAREST: return GL_NEAREST;
 	case TEX_LINEAR:  return GL_LINEAR;
-	default:          throw new PPEResourceException("illegal filter");
+	default:          throw PPEResourceException("illegal filter");
     }
 }
 
@@ -344,7 +344,7 @@ TexelFormat TextureCube::GetOEInternalFormat(GLint glInternalFormat) {
 	case GL_LUMINANCE16F_ARB:     return TEX_LUMINANCE_FLOAT;
 	case GL_RGB16F_ARB:           return TEX_RGB_FLOAT;
 	case GL_RGBA16F_ARB:          return TEX_RGBA_FLOAT;
-	default:                      throw new PPEResourceException("getOEInternalFormat: illegal format");
+	default:                      throw PPEResourceException("getOEInternalFormat: illegal format");
     }
 }
 
@@ -355,7 +355,7 @@ TextureWrap TextureCube::GetOEWrap(GLint glWrap) {
 	case GL_CLAMP_TO_BORDER: return TEX_CLAMP_TO_BORDER;
 	case GL_REPEAT:	         return TEX_REPEAT;
 	case GL_MIRRORED_REPEAT: return TEX_MIRRORED_REPEAT;
-	default:                 throw new PPEResourceException("illegal wrap");
+	default:                 throw PPEResourceException("illegal wrap");
     }
 }
 
@@ -363,7 +363,7 @@ TextureFilter TextureCube::GetOEFilter(GLint glFilter) {
     switch (glFilter) {
 	case GL_NEAREST: return TEX_NEAREST;
 	case GL_LINEAR:  return TEX_LINEAR;
-	default:         throw new PPEResourceException("illegal filter");
+	default:         throw PPEResourceException("illegal filter");
     }
 }
 
@@ -399,7 +399,7 @@ void TextureCube::CreateOrModifyTexture(int width, int height, TexelFormat forma
  *  @note seems OpenGL doesn't have build-in support for this, so we use FBOs to achieve it
  */
 void TextureCube::CopyTexture(ITextureCubePtr destTex) {
-    throw new PPEResourceException("not implemented yet!");
+    throw PPEResourceException("not implemented yet!");
 }
 
 
@@ -455,7 +455,7 @@ int TextureCube::GetNumComponents() {
 	case TEX_LUMINANCE_FLOAT: return 1;
 	case TEX_RGB_FLOAT:	  return 3;
 	case TEX_RGBA_FLOAT:	  return 4;
-	default:                  throw new PPEResourceException("GetNumComponents: illegal format");
+	default:                  throw PPEResourceException("GetNumComponents: illegal format");
     }
 }
 
@@ -464,7 +464,7 @@ int TextureCube::GetNumComponents() {
  *  @note seems OpenGL doesn't have build-in support for this, so we use FBOs to achieve it
  */
 unsigned char* TextureCube::GetData(int face, GLenum type) {
-    throw new PPEResourceException("not implemented yet!");
+    throw PPEResourceException("not implemented yet!");
     return NULL;
 }
 

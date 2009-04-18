@@ -76,7 +76,7 @@ int RenderBuffer::GetZDepth() {
  *  @returns the bit-depth
  */
 unsigned int RenderBuffer::GetDepth() {
-    throw new NotImplemented();
+    throw NotImplemented();
 }
 
 /** get the internal format of this renderbuffer
@@ -120,7 +120,7 @@ void RenderBuffer::Resize(int width, int height, PixelFormat format) {
  *  (returns arrays instead of vectors, because this is how it is in ITextureResource)
  */
 unsigned char* RenderBuffer::GetData() {
-    throw new NotImplemented();
+    throw NotImplemented();
 }
 
 /** returns an array of floats of size width*height*numcomponents
@@ -128,19 +128,19 @@ unsigned char* RenderBuffer::GetData() {
  *  (returns arrays instead of vectors, because this is how it is in ITextureResource)
  */
 float* RenderBuffer::GetFloatData() {
-    throw new NotImplemented();
+    throw NotImplemented();
 }
 
 /** expected array of the same size as the texture multiplied by num components: GetWidth()*GetHeight()*numcomp
  */
 void RenderBuffer::SetData(unsigned char* data) {
-    throw new NotImplemented();
+    throw NotImplemented();
 }
 
 /** expected array of the same size as the texture multiplied by num components: GetWidth()*GetHeight()*numcomp
  */
 void RenderBuffer::SetFloatData(float* data) {
-    throw new NotImplemented();
+    throw NotImplemented();
 }
 
 void RenderBuffer::CreateOrModifyRB(int width, int height, PixelFormat format) {
@@ -158,7 +158,7 @@ GLint RenderBuffer::GetGLInternalFormat(PixelFormat format) {
 	case RB_STENCIL: return GL_STENCIL_INDEX;
 	case RB_RGB:	 return GL_RGB;
 	case RB_RGBA:	 return GL_RGBA;
-	default:         throw new PPEResourceException("illegal format");
+	default:         throw PPEResourceException("illegal format");
     }
 }
 
@@ -176,7 +176,7 @@ PixelFormat RenderBuffer::GetOEInternalFormat(GLint glInternalFormat) {
 	case GL_STENCIL_INDEX:   return RB_STENCIL;
 	case GL_RGB:             return RB_RGB;
 	case GL_RGBA:            return RB_RGBA;
-	default:                 throw new PPEResourceException("illegal format2");
+	default:                 throw PPEResourceException("illegal format2");
     }
 }
 
@@ -222,7 +222,7 @@ ImageType RenderBuffer::GetImageType() {         // texture2D, renderbuffer, ...
 }
 
 void RenderBuffer::GuardedBind()  {
-    if (savedRbID != 0) throw new PPEResourceException("internal error"); // to prevent recursive-ish routines messing up the guardedBind
+    if (savedRbID != 0) throw PPEResourceException("internal error"); // to prevent recursive-ish routines messing up the guardedBind
     glGetIntegerv(GL_RENDERBUFFER_BINDING_EXT, &savedRbID);
     if (rbID != (GLuint)savedRbID) // no need to bind if this RB is already bound
         glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, rbID);

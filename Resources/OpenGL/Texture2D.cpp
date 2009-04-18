@@ -323,7 +323,12 @@ TexelFormat Texture2D::GetOEInternalFormat(GLint glInternalFormat) {
 	case GL_LUMINANCE16F_ARB:     return TEX_LUMINANCE_FLOAT;
 	case GL_RGB16F_ARB:           return TEX_RGB_FLOAT;
 	case GL_RGBA16F_ARB:          return TEX_RGBA_FLOAT;
-    default:                      throw new PPEResourceException(("getOEInternalFormat: illegal format: " + Convert::ToString(glInternalFormat)).c_str());
+
+        // added by: CPVC found on:
+        // http://svn.clifford.at/qcake/trunk/qt4/include/GLee.h
+	case GL_DEPTH_COMPONENT24_ARB: return TEX_DEPTH_STENCIL;
+
+    default:                      throw PPEResourceException(("getOEInternalFormat: illegal format: " + Convert::ToString(glInternalFormat)).c_str());
     }
 }
 
@@ -334,7 +339,7 @@ TextureWrap Texture2D::GetOEWrap(GLint glWrap) {
 	case GL_CLAMP_TO_BORDER: return TEX_CLAMP_TO_BORDER;
 	case GL_REPEAT:	         return TEX_REPEAT;
 	case GL_MIRRORED_REPEAT: return TEX_MIRRORED_REPEAT;
-	default:                 throw new PPEResourceException("illegal wrap");
+	default:                 throw PPEResourceException("illegal wrap");
     }
 }
 
@@ -342,7 +347,7 @@ TextureFilter Texture2D::GetOEFilter(GLint glFilter) {
     switch (glFilter) {
 	case GL_NEAREST: return TEX_NEAREST;
 	case GL_LINEAR:  return TEX_LINEAR;
-	default:         throw new PPEResourceException("illegal filter");
+	default:         throw PPEResourceException("illegal filter");
     }
 }
 
@@ -369,8 +374,8 @@ void Texture2D::CreateOrModifyTexture(int width, int height, TexelFormat format,
  */
 void Texture2D::CopyTexture(ITexture2DPtr destTex) {
 
-    if (destTex.get() == NULL) throw new PPEResourceException("destTex was NULL");
-    if (GetFormat() == TEX_DEPTH_STENCIL) throw new PPEResourceException("depth_stencil texture copy not implemented");
+    if (destTex.get() == NULL) throw PPEResourceException("destTex was NULL");
+    if (GetFormat() == TEX_DEPTH_STENCIL) throw PPEResourceException("depth_stencil texture copy not implemented");
 
     glPushAttrib(GL_ALL_ATTRIB_BITS); // to avoid side effects
     GLint savedFboID;
@@ -410,7 +415,7 @@ void Texture2D::CopyTexture(ITexture2DPtr destTex) {
     glBindTexture(GL_TEXTURE_2D, (GLuint)destTex->GetID());
     glGetIntegerv(GL_TEXTURE_BINDING_2D, &bound2DTex);
     glBindTexture(GL_TEXTURE_2D, 0);
-    if ((GLuint)destTex->GetID() != (GLuint)bound2DTex) throw new PPEResourceException("outTexID must be a 2D texture!");
+    if ((GLuint)destTex->GetID() != (GLuint)bound2DTex) throw PPEResourceException("outTexID must be a 2D texture!");
 
     // set which attachment (color or depth) we should attach the source-texture to, depending on its internal-format
     GLenum attachment;
@@ -514,7 +519,7 @@ int Texture2D::GetNumComponents() {
 	case TEX_LUMINANCE_FLOAT: return 1;
 	case TEX_RGB_FLOAT:	  return 3;
 	case TEX_RGBA_FLOAT:	  return 4;
-	default:                  throw new PPEResourceException("GetNumComponents: illegal format");
+	default:                  throw PPEResourceException("GetNumComponents: illegal format");
     }
 }
 
@@ -532,7 +537,7 @@ unsigned char* Texture2D::GetData(GLenum type) {
     switch (type) {
 	case GL_FLOAT        : arrayElemByteDepth = 4; break;
 	case GL_UNSIGNED_BYTE: arrayElemByteDepth = 1; break;
-	default: throw new PPEResourceException("GetData: internal error");
+	default: throw PPEResourceException("GetData: internal error");
     }
 
     // fbo used for texure reading (shared among all Texture2D instances) @todo: use FBO class when it is made!

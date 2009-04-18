@@ -142,7 +142,7 @@ void PostProcessingPass::BindTexture(string fpParameterName, ITextureResourcePtr
  */
 void PostProcessingPass::BindColorBuffer(string fpParameterName) {
     if (inputColorBufferParameterName == "") inputColorBufferParameterName = fpParameterName;
-    else                                     throw new PostProcessingException("colorbuffer texture already assigned to an input parameter");
+    else                                     throw PostProcessingException("colorbuffer texture already assigned to an input parameter");
 }
 
 /** Bind the depth buffer to a uniform sampler2D input-parameter of the fragmentprogram of this pass.
@@ -153,7 +153,7 @@ void PostProcessingPass::BindColorBuffer(string fpParameterName) {
  */
 void PostProcessingPass::BindDepthBuffer(string fpParameterName) {
     if (inputDepthBufferParameterName == "") inputDepthBufferParameterName = fpParameterName;
-    else                                     throw new PostProcessingException("depthbuffer texture already assigned to an input parameter");
+    else                                     throw PostProcessingException("depthbuffer texture already assigned to an input parameter");
 }
 
 
@@ -171,11 +171,11 @@ void PostProcessingPass::BindDepthBuffer(string fpParameterName) {
  *  @exception PostProcessingException thrown if there were no userbuffer in outputPass at outputAttachmentPoint
  */
 void PostProcessingPass::BindUserBuffer(string fpParameterName, IPostProcessingPass* outputPass, int outputAttachmentPoint) {
-    if (this->ppe != ((PostProcessingPass*)outputPass)->ppe) throw new PostProcessingException("can only bind userbuffers from a pass belonging to the same PostProcessingEffect as this pass");
-    if (this->passID <= ((PostProcessingPass*)outputPass)->passID) throw new PostProcessingException("can only bind userbuffers from passes executed earlier than this pass!");
-    if (outputAttachmentPoint >= maxColorAttachments) throw new PostProcessingException("attachmentpoint too large (for this gfx card)");
-    if (!(outputPass->IsUserBufferOutput(outputAttachmentPoint))) throw new PostProcessingException("there were no userbuffer for the outputpass at the attachmentpoint");
-    //if (outputPass->userBufferTextures[outputAttachmentPoint] == NULL) throw new PostProcessingException("there were no userbuffer for the outputpass at the attachmentpoint");
+    if (this->ppe != ((PostProcessingPass*)outputPass)->ppe) throw PostProcessingException("can only bind userbuffers from a pass belonging to the same PostProcessingEffect as this pass");
+    if (this->passID <= ((PostProcessingPass*)outputPass)->passID) throw PostProcessingException("can only bind userbuffers from passes executed earlier than this pass!");
+    if (outputAttachmentPoint >= maxColorAttachments) throw PostProcessingException("attachmentpoint too large (for this gfx card)");
+    if (!(outputPass->IsUserBufferOutput(outputAttachmentPoint))) throw PostProcessingException("there were no userbuffer for the outputpass at the attachmentpoint");
+    //if (outputPass->userBufferTextures[outputAttachmentPoint] == NULL) throw PostProcessingException("there were no userbuffer for the outputpass at the attachmentpoint");
 
     // bind the output texture to the input-parameter
     ITexture2DPtr outputTex = outputPass->GetUserBufferRef(outputAttachmentPoint);//outputPass->userBufferTextures[outputAttachmentPoint];
@@ -194,7 +194,7 @@ void PostProcessingPass::BindUserBuffer(string fpParameterName, IPostProcessingP
 void PostProcessingPass::EnableColorBufferOutput() {
     // NOTE: the buffer is not attached here to the fbo for the pass, it's done in executePass(), since we don't know here which of
     //       the two ping-pong textures for the buffer that will be the one that must be attached.
-    if (userBufferTextures[0].get() != NULL) throw new PostProcessingException("can't attach both colorbuffer and userbuffer at attachment-point 0");
+    if (userBufferTextures[0].get() != NULL) throw PostProcessingException("can't attach both colorbuffer and userbuffer at attachment-point 0");
     outputsToColorBuffer = true;
 }
 
@@ -228,9 +228,9 @@ void PostProcessingPass::EnableDepthBufferOutput() {
  *  @exception PostProcessingException thrown if there were already attached a userbuffer at the given attachmentPoint.
  */
 void PostProcessingPass::AttachUserBuffer(int attachmentPoint, const bool createFloatTexture) {
-    if (attachmentPoint >= maxColorAttachments) throw new PostProcessingException("attachmentpoint too large (for this gfx card)");
-    if (attachmentPoint==0 && outputsToColorBuffer) throw new PostProcessingException("can't attach both colorbuffer and userbuffer at attachment-point 0");
-    if (userBufferTextures[attachmentPoint].get() != NULL) throw new PostProcessingException("there were already a output-userbuffer for this pass at this attachmentpoint");
+    if (attachmentPoint >= maxColorAttachments) throw PostProcessingException("attachmentpoint too large (for this gfx card)");
+    if (attachmentPoint==0 && outputsToColorBuffer) throw PostProcessingException("can't attach both colorbuffer and userbuffer at attachment-point 0");
+    if (userBufferTextures[attachmentPoint].get() != NULL) throw PostProcessingException("there were already a output-userbuffer for this pass at this attachmentpoint");
 
     // create a new color-texture (since we're using rextures, not renderbuffers)
     ITexture2DPtr tex;
@@ -253,8 +253,8 @@ void PostProcessingPass::AttachUserBuffer(int attachmentPoint, const bool create
  *  @exception PostProcessingException thrown if there were no userbuffers at the attachment point.
  */
 ITexture2DPtr PostProcessingPass::GetUserBuffer(int attachmentPoint) {
-    if (attachmentPoint >= maxColorAttachments) throw new PostProcessingException("attachmentpoint too large (for this gfx card)");
-    if (userBufferTextures[attachmentPoint].get() == NULL) throw new PostProcessingException("there were no userbuffer for this pass at this attachmentpoint");
+    if (attachmentPoint >= maxColorAttachments) throw PostProcessingException("attachmentpoint too large (for this gfx card)");
+    if (userBufferTextures[attachmentPoint].get() == NULL) throw PostProcessingException("there were no userbuffer for this pass at this attachmentpoint");
 
     // lav en kopi af texturen
     ITexture2DPtr tex = userBufferTextures[attachmentPoint];
@@ -272,8 +272,8 @@ ITexture2DPtr PostProcessingPass::GetUserBuffer(int attachmentPoint) {
  *  @exception PostProcessingException thrown if the shared-pointer texCopy contains NULL (done in copyColorTexture)
  */
 void PostProcessingPass::GetUserBuffer(int attachmentPoint, ITexture2DPtr texCopy) {
-    if (attachmentPoint >= maxColorAttachments) throw new PostProcessingException("attachmentpoint too large (for this gfx card)");
-    if (userBufferTextures[attachmentPoint].get() == NULL) throw new PostProcessingException("there were no userbuffer for this pass at this attachmentpoint");
+    if (attachmentPoint >= maxColorAttachments) throw PostProcessingException("attachmentpoint too large (for this gfx card)");
+    if (userBufferTextures[attachmentPoint].get() == NULL) throw PostProcessingException("there were no userbuffer for this pass at this attachmentpoint");
 
     // lav en kopi af texturen
     ITexture2DPtr tex = userBufferTextures[attachmentPoint];
@@ -293,8 +293,8 @@ void PostProcessingPass::GetUserBuffer(int attachmentPoint, ITexture2DPtr texCop
  *  @exception PostProcessingException thrown if there were no userbuffers at the attachment point.
  */
 ITexture2DPtr PostProcessingPass::GetUserBufferRef(int attachmentPoint) {
-    if (attachmentPoint >= maxColorAttachments) throw new PostProcessingException("attachmentpoint too large (for this gfx card)");
-    if (userBufferTextures[attachmentPoint].get() == NULL) throw new PostProcessingException("there were no userbuffer for this pass at this attachmentpoint");
+    if (attachmentPoint >= maxColorAttachments) throw PostProcessingException("attachmentpoint too large (for this gfx card)");
+    if (userBufferTextures[attachmentPoint].get() == NULL) throw PostProcessingException("there were no userbuffer for this pass at this attachmentpoint");
     return userBufferTextures[attachmentPoint];
 }
 
@@ -451,8 +451,8 @@ void PostProcessingPass::PerformGpuComputation(Viewport* viewport) {
  *  @exception PostProcessingException thrown if there were no userbuffers at the attachment point.
  */
 void PostProcessingPass::SetUserBufferWrap(int attachmentPoint, TextureWrap wrapS, TextureWrap wrapT) {
-    if (attachmentPoint >= maxColorAttachments) throw new PostProcessingException("attachmentpoint too large (for this gfx card)");
-    if (userBufferTextures[attachmentPoint].get() == NULL) throw new PostProcessingException("there were no userbuffer for this pass at this attachmentpoint");
+    if (attachmentPoint >= maxColorAttachments) throw PostProcessingException("attachmentpoint too large (for this gfx card)");
+    if (userBufferTextures[attachmentPoint].get() == NULL) throw PostProcessingException("there were no userbuffer for this pass at this attachmentpoint");
 
     ITexture2DPtr tex = userBufferTextures[attachmentPoint];
     tex->SetWrapS(wrapS);
@@ -468,8 +468,8 @@ void PostProcessingPass::SetUserBufferWrap(int attachmentPoint, TextureWrap wrap
  *  @note at the moment we have no use for setting mag or min filters seperately
  */
 void PostProcessingPass::SetUserBufferFilter(int attachmentPoint, TextureFilter filter) {
-    if (attachmentPoint >= maxColorAttachments) throw new PostProcessingException("attachmentpoint too large (for this gfx card)");
-    if (userBufferTextures[attachmentPoint].get() == NULL) throw new PostProcessingException("there were no userbuffer for this pass at this attachmentpoint");
+    if (attachmentPoint >= maxColorAttachments) throw PostProcessingException("attachmentpoint too large (for this gfx card)");
+    if (userBufferTextures[attachmentPoint].get() == NULL) throw PostProcessingException("there were no userbuffer for this pass at this attachmentpoint");
 
     ITexture2DPtr tex = userBufferTextures[attachmentPoint];
     tex->SetMagFilter(filter);

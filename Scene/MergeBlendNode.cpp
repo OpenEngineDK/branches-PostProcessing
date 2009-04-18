@@ -44,7 +44,7 @@ void MergeBlendNode::GetParentTextures() {
     GLint depthType;
     glGetFramebufferAttachmentParameterivEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE_EXT, &colorType);
     glGetFramebufferAttachmentParameterivEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT , GL_FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE_EXT, &depthType);
-    if (colorType != GL_TEXTURE || depthType != GL_TEXTURE) throw new PostProcessingException("internal error");
+    if (colorType != GL_TEXTURE || depthType != GL_TEXTURE) throw PostProcessingException("internal error");
 
     GLint colorID;
     GLint depthID;

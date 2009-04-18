@@ -13,13 +13,10 @@ using std::string;
  *  @author Bjarke N. Laustsen
  */
 class PostProcessingException : public Exception {
-  private:
-    string msg;
   public:
     PostProcessingException();
-    PostProcessingException(string msg);
+    PostProcessingException(std::string msg);
     virtual ~PostProcessingException() throw () {}
-    string toString();
 };
 
 } // NS PostProcessing
