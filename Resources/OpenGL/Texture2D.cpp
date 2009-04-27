@@ -316,6 +316,9 @@ GLsizei Texture2D::GetGLHeight(int height) {
 TexelFormat Texture2D::GetOEInternalFormat(GLint glInternalFormat) {
   switch (glInternalFormat) {
 	case GL_DEPTH_COMPONENT:      return TEX_DEPTH;
+	case GL_DEPTH_COMPONENT16:    return TEX_DEPTH;
+	case GL_DEPTH_COMPONENT24:    return TEX_DEPTH;
+	case GL_DEPTH_COMPONENT32:    return TEX_DEPTH;
 	case GL_DEPTH24_STENCIL8_EXT: return TEX_DEPTH_STENCIL;
 	case GL_LUMINANCE8:           return TEX_LUMINANCE;
 	case GL_RGB8:                 return TEX_RGB;
@@ -326,7 +329,7 @@ TexelFormat Texture2D::GetOEInternalFormat(GLint glInternalFormat) {
 
         // added by: CPVC found on:
         // http://svn.clifford.at/qcake/trunk/qt4/include/GLee.h
-	case GL_DEPTH_COMPONENT24_ARB: return TEX_DEPTH_STENCIL;
+        //case GL_DEPTH_COMPONENT24_ARB: return TEX_DEPTH;
 
     default:                      throw PPEResourceException(("getOEInternalFormat: illegal format: " + Convert::ToString(glInternalFormat)).c_str());
     }
